@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <style type="text/css">
+    div {
+      text-align: center;
+      margin: 100px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div>
+    <form method="POST" action="/api/home/token" >
+      <fieldset >
+        <legend>生成Json Web Token</legend>
+      <label for="userName">用户名<input name="userName" type="text" /></label>
+      <label for="userPass">密码<input name="userPass" type="password" /></label>
+      <input type="submit" value="生成" />
+    </fieldset>
+    </form>
+  </div>
+</body>

@@ -1,0 +1,12 @@
+{
+  "watch": [
+    "./src/"
+  ],
+  "ignore": [
+    "./src/views/",
+    "./src/public"
+  ],
+  "verbose": true,
+  "ext": "js json",
+  "legacy-watch": false
+}

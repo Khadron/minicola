@@ -1,0 +1,20 @@
+{
+  "helloworldPage": {
+    "route": "/",
+    "method": "get",
+    "type": "web",
+    "ignoreauth": true
+  },
+  "tokenPage": {
+    "route": "/token",
+    "method": "get",
+    "type": "web",
+    "ignoreauth": true
+  },
+  "generateToken": {
+    "pathname": "/token",
+    "method": "post",
+    "type": "webApi",
+    "ignoreauth": true
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "cola",
+  "version": "2.0.0",
+  "description": "一个基于koa2，小而美的web开发框架！",
+  "main": "server.js",
+  "scripts": {
+    "prod": "cross-env NODE_ENV=production node ./src/server",
+    "dev": "cross-env NODE_ENV=development node ./src/server",
+    "test": "cross-env NODE_ENV=test node ./src/server"
+  },
+  "author": "khadron <khadron@163.com> (http://khadron.com)",
+  "license": "MIT",
+  "repository": "Khadron/cola",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "ioredis": "^4.5.1",
+    "jsonwebtoken": "^8.3.0",
+    "koa": "^2.5.0",
+    "koa-body": "^2.5.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-convert": "^1.2.0",
+    "koa-generic-session": "^2.0.1",
+    "koa-json": "^2.0.2",
+    "koa-log": "^2.1.0",
+    "koa-onerror": "^4.0.0",
+    "koa-redis": "^3.1.2",
+    "koa-router": "^7.4.0",
+    "koa-static": "^4.0.2",
+    "koa-views": "^6.1.4",
+    "request": "^2.85.0",
+    "socket.io": "^2.1.1",
+    "uuid": "^3.3.2",
+    "xss": "^1.0.3"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "nodemon": "^1.17.2"
+  }
+}
