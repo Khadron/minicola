@@ -1,5 +1,4 @@
-#
-项目名 &logo
+# Cola
 
 简介
 cola 一个基于koa2，小而美的web开发框架！
