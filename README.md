@@ -2,6 +2,7 @@
 
 ## 简介
 **mincola** 一个基于**koa2**，小而美的**RESTful API** + **MVC**的Web开发框架！
+
 支持websocket和多进程
 
 ## 设计思想
@@ -33,6 +34,8 @@ API鉴权模块，采用JSON Web Token验证方式，多进程实现
 ## 运行环境
 
 node version >=8.94
+
+koa >=2.0
 
 ## 命令
 
