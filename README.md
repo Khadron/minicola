@@ -156,10 +156,11 @@ module.exports = Object.assign({}, template);
 
 ``` js
 /*
-  命令行中执行下面命令
+  在命令行中执行下面命令
 */
+1. npm install
 
-npm run dev
+2. npm run dev
 
 ```
 
