@@ -17,7 +17,7 @@ class HomeController {
     });
   }
 
-  async tokenPage(){
+  async tokenPage() {
     await this.ctx.render("token", {
       title: "cola"
     });
@@ -26,11 +26,10 @@ class HomeController {
 
   async generateToken(userName, userPass) {
     let handler = await auth;
+    model.userName = userName;
+    model.userPass = userPass;
     return new Promise((resolve, reject) => {
-      handler.encode({
-        userPass,
-        userName
-      }, secret, "1d", (error, data) => {
+      handler.encode(model, secret, "1d", (error, data) => {
         if (error) {
           reject(error);
         } else {

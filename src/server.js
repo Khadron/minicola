@@ -1,6 +1,6 @@
 const config = require('./config/index.js');
 const app = require('./app');
-const port = normalizePort(process.env.PORT || '3389');
+const port = normalizePort(process.env.PORT || '3669');
 
 process.env.UV_THREADPOOL_SIZE = config.max_pool_size;
 

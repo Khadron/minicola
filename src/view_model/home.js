@@ -1,5 +1,5 @@
 const template = {
-  userId: "",
+  userPass: "",
   userName: ""
 };
 
