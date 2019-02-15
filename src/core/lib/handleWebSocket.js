@@ -13,7 +13,7 @@ class WebSocket extends EventEmitter {
   init(nspn) {
 
     let self = this;
-    this._nsp = this._socketServer.of(nspn || 'cola');
+    this._nsp = this._socketServer.of(nspn || 'mincola');
     this._nsp.use((socket, next) => {
       next();
     });

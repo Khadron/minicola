@@ -86,7 +86,7 @@ module.exports = function (config = {}) {
     delete defaultOpts.headers["origin"];
     delete defaultOpts.headers["referer"];
     delete defaultOpts.headers["authorization"];
-    defaultOpts.headers["user-agent"] = "cola";
+    defaultOpts.headers["user-agent"] = "mincola";
     defaultOpts.headers["Transfer-Encoding"] = "chunked";
     defaultOpts.headers["userIdentity"] = defaultOpts.headers["useridentity"] ? defaultOpts.headers["useridentity"] : "";
     defaultOpts.headers["loginName"] = "";

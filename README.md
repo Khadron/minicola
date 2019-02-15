@@ -1,7 +1,7 @@
-# Cola
+# mincola
 
 ## 简介
-**cola** 一个基于**koa2**，小而美的**RESTful API** + **MVC**的Web开发框架！
+**mincola** 一个基于**koa2**，小而美的**RESTful API** + **MVC**的Web开发框架！
 支持websocket和多进程
 
 ## 设计思想
@@ -9,6 +9,7 @@
 * 约定大于配置
 * 精简而优美
 * 轻量可扩展
+* 追求优雅实现
 
 ## 特性
 
@@ -59,7 +60,7 @@ class HomeController {
   async homePage() {
 
     await this.ctx.render("home", {
-      title: "cola",
+      title: "mincola",
       letter: "hello world!"
     });
   }
@@ -138,8 +139,8 @@ module.exports = Object.assign({}, template);
 
 <body>
   <div>
-    <h1>Cola</h1>
-    <p>一个基于koa2，小而美的web开发框架！</p>
+    <h1>mincola</h1>
+    <p>一个基于koa2，小而美的RESTful API + MVC的web开发框架！</p>
     <h2>
       <%= letter %>
     </h2>

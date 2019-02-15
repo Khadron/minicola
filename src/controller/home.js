@@ -12,14 +12,14 @@ class HomeController {
   async helloworldPage() {
 
     await this.ctx.render("home", {
-      title: "cola",
+      title: "mincola",
       letter: "hello world!"
     });
   }
 
   async tokenPage() {
     await this.ctx.render("token", {
-      title: "cola"
+      title: "mincola"
     });
   }
 

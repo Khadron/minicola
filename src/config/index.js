@@ -1,6 +1,6 @@
 const main = {
   websocket: {
-      path: '/cola',
+      path: '/mincola',
       serveClient: false,
       pingInterval: 10000,
       pingTimeout: 5000,

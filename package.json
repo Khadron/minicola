@@ -1,7 +1,7 @@
 {
-  "name": "cola",
+  "name": "minicola",
   "version": "2.0.0",
-  "description": "一个基于koa2，小而美的web开发框架！",
+  "description": "一个基于koa2，小而美的RESTful API+MVC的web开发框架！",
   "main": "server.js",
   "scripts": {
     "prod": "cross-env NODE_ENV=production node ./src/server",
@@ -10,7 +10,7 @@
   },
   "author": "khadron <khadron@163.com> (http://khadron.com)",
   "license": "MIT",
-  "repository": "Khadron/cola",
+  "repository": "Khadron/minicola",
   "dependencies": {
     "ejs": "^2.6.1",
     "ioredis": "^4.5.1",
