@@ -3,11 +3,11 @@ const secret = require("../../config").secret;
 
 module.exports = {
 
-  decode(token,secret) {
+  decode(token) {
 
     return jwt.verify(token, secret);
   },
-  encode(content, secret, expires) {
+  encode(content, expires) {
     return jwt.sign(content, secret, {
       expiresIn: expires
     });

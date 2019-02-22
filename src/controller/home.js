@@ -1,12 +1,9 @@
 const authService = require("../services/auth");
-const secret = require("../config").secret;
 const model = require("../view_model/home");
-let auth = null;
 
 class HomeController {
 
   constructor() {
-    auth = authService.getInstance();
   }
 
   async helloworldPage() {
@@ -25,11 +22,12 @@ class HomeController {
 
 
   async generateToken(userName, userPass) {
-    let handler = await auth;
     model.userName = userName;
     model.userPass = userPass;
+
+    let handler = await authService;
     return new Promise((resolve, reject) => {
-      handler.encode(model, secret, "1d", (error, data) => {
+      handler.encode(model, "1d", (error, data) => {
         if (error) {
           reject(error);
         } else {

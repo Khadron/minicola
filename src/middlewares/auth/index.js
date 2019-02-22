@@ -1,13 +1,10 @@
-const secret = require("../../config").secret;
 const authService = require("../../services/auth");
-
 
 module.exports = () => {
 
-  let handler = authService.getInstance();
-  const decoded = (token) => {
+  const decoded = (handler, token) => {
     return new Promise((resolve, reject) => {
-      handler.decode(token, secret, (error, data) => {
+      handler.decode(token, (error, data) => {
         if (error) {
           reject(error)
         } else {
@@ -17,12 +14,13 @@ module.exports = () => {
     });
   }
 
-
   return async function colaAuth(ctx, next) {
 
     if (ctx.method === "HEAD" || ctx.method === "OPTIONS") {
       return await next();
     }
+
+    let handler = await authService;
 
     let matched = false;
     for (let i = 0, l = ctx.app.routeMatcher.length; i < l; i++) {
@@ -41,7 +39,7 @@ module.exports = () => {
         const token = authorization.replace(/\"/g, "");
         try {
 
-          let code = await decoded(token);
+          let code = await decoded(handler, token);
           if (code) {
             ctx.auth = {
               userId: code.userId,
@@ -49,7 +47,7 @@ module.exports = () => {
             }
           }
         } catch (err) {
-          console.log(err);
+          console.log("token解析异常 === ", err);
           ctx.body = {
             error: true,
             code: -1,
