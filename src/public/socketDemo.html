@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>minicola</title>
+    <style>
+      textarea {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        width: 355px;
+        height: 100px;
+        padding: 10px;
+        resize: none;
+      }
+      .my-button {
+        display: inline-block;
+        *display: inline;
+        zoom: 1;
+        padding: 6px 20px;
+        margin: 0;
+        cursor: pointer;
+        border: 1px solid #bbb;
+        overflow: visible;
+        font: bold 13px arial, helvetica, sans-serif;
+        text-decoration: none;
+        white-space: nowrap;
+        color: #555;
+        background-color: #ddd;
+        background-image: -webkit-gradient(
+          linear,
+          left top,
+          left bottom,
+          from(rgba(255, 255, 255, 1)),
+          to(rgba(255, 255, 255, 0))
+        );
+        background-image: -webkit-linear-gradient(
+          top,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0)
+        );
+        background-image: -moz-linear-gradient(
+          top,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0)
+        );
+        background-image: -ms-linear-gradient(
+          top,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0)
+        );
+        background-image: -o-linear-gradient(
+          top,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0)
+        );
+        background-image: linear-gradient(
+          top,
+          rgba(255, 255, 255, 1),
+          rgba(255, 255, 255, 0)
+        );
+        -webkit-transition: background-color 0.2s ease-out;
+        -moz-transition: background-color 0.2s ease-out;
+        -ms-transition: background-color 0.2s ease-out;
+        -o-transition: background-color 0.2s ease-out;
+        transition: background-color 0.2s ease-out;
+        background-clip: padding-box;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3),
+          0 2px 2px -1px rgba(0, 0, 0, 0.5),
+          0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3),
+          0 2px 2px -1px rgba(0, 0, 0, 0.5),
+          0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3),
+          0 2px 2px -1px rgba(0, 0, 0, 0.5),
+          0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Demo</h1>
+    <h2>服务器时间：<b id="msg"></b></h2>
+    <p>
+      <textarea id="content" placeholder="请输入消息"></textarea>
+    </p>
+    <p>
+      <input
+        class="my-button"
+        id="aaa"
+        type="button"
+        value="发送"
+        onclick="sendMessage()"
+      />
+    </p>
+    <script>
+      var ws = new WebSocket("ws://localhost:3669");
+
+      ws.onopen = function(evt) {
+        console.log("Connection open ...");
+        ws.send(JSON.stringify({ target: "cola", data: "Hello World!" }));
+      };
+
+      ws.onmessage = function(evt) {
+        console.dir("Received Message: " + evt);
+        document.getElementById("msg").innerText = evt.data;
+        // ws.close();
+      };
+
+      ws.onclose = function(evt) {
+        console.log("Connection closed.");
+      };
+      function sendMessage() {
+        ws.send(
+          JSON.stringify(
+            {
+              target: "cola",
+              data: document.getElementById("content").value
+            },
+            function(data) {
+              console.log(data);
+              document.getElementById("content").value = "";
+              alert("发送成功,");
+            }
+          )
+        );
+      }
+    </script>
+  </body>
+</html>

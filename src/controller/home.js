@@ -1,13 +1,12 @@
+/* eslint-disable no-useless-constructor */
 const authService = require("../services/auth");
 const model = require("../view_model/home");
+const { formatTime } = require("../utils");
 
 class HomeController {
-
-  constructor() {
-  }
+  constructor() {}
 
   async helloworldPage() {
-
     await this.ctx.render("home", {
       title: "mincola",
       letter: "hello world!"
@@ -20,23 +19,35 @@ class HomeController {
     });
   }
 
-
   async generateToken(userName, userPass) {
     model.userName = userName;
     model.userPass = userPass;
 
-    let handler = await authService;
+    const handler = await authService;
     return new Promise((resolve, reject) => {
-      handler.encode(model, "1d", (error, data) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
+      handler.encode(
+        {
+          content: model,
+          exports: "1d"
+        },
+        (error, data) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(data);
+          }
         }
-      });
+      );
     });
+  }
 
+  async chat(clients, data) {
+    // clients 广播
+    console.log(">>>client message:", data);
+    setInterval(() => {
+      this.send(formatTime(new Date()));
+    }, 1000);
   }
 }
 
-module.exports = new HomeController()
+module.exports = new HomeController();

@@ -1,36 +1,35 @@
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable no-param-reassign */
+const fs = require("fs");
+const path = require("path");
 const http = require("http");
 const https = require("https");
-const handleRoute = require('./lib/handleRoute');
+const appConfig = require("../application.json");
+const handleRoute = require("./lib/handleRoute");
+const handleWebSocket = require("./lib/handleWebSocket");
+const handleSpaMode = require("./lib/handleHistoryMode");
 
 function traverseDir(dir, result) {
-
   result = result || [];
   if (path.isAbsolute(dir) === false) {
     dir = path.join(process.cwd(), dir);
   }
-
-  let stat = fs.lstatSync(dir);
+  const stat = fs.lstatSync(dir);
   if (stat.isDirectory()) {
-    let filenames = fs.readdirSync(dir);
-    filenames.forEach(function (cur, index, arr) {
-      cur = path.join(dir, cur)
+    const filenames = fs.readdirSync(dir);
+    filenames.forEach(function(cur, index, arr) {
+      cur = path.join(dir, cur);
       traverseDir(cur, result);
-    })
-
+    });
   } else {
     result.push(dir);
   }
-
   return result;
 }
 
 function generateCtrlFiles(ctrlRoot) {
-
   let ctrlFiles = [];
   try {
-    ctrlFiles = traverseDir(ctrlRoot)
+    ctrlFiles = traverseDir(ctrlRoot);
   } catch (error) {
     console.error(error);
   }
@@ -38,39 +37,55 @@ function generateCtrlFiles(ctrlRoot) {
 }
 
 module.exports = (app, options) => {
-
-  options = Object.assign({
+  process.env.UV_THREADPOOL_SIZE = appConfig.max_pool_size;
+  const opts = {
     ctrlRoot: path.join(__dirname, "../controller"),
-    routeCfgRoot: path.join(__dirname, "../route_config")
-  }, options);
-  let ctrls = generateCtrlFiles(options.ctrlRoot);
-  let route = handleRoute(ctrls, options.routeCfgRoot);
-  app.use(route.routes())
-    .use(route.allowedMethods());
-  app.routeMatcher = route.stack.map((value) => {
+      routeCfgRoot: path.join(__dirname, "../route_config"),
+    ...options
+  };
+  const ctrls = generateCtrlFiles(opts.ctrlRoot);
+  const router = handleRoute(ctrls, {
+    routes: appConfig.app_routes,
+    routeCfgRoot: opts.routeCfgRoot
+  });
+  app.use(router.routes()).use(router.allowedMethods());
+  app.routeMatcher = router.stack.map(value => {
     return {
       regexp: value.regexp,
       path: value.path,
       ignoreauth: value.ignoreauth
-    }
+    };
   });
 
-  if (!app.server) {
+  let server = null;
+  if (appConfig.enable_https) {
+    server = https.createServer(
+      {
+        cert: fs.readFileSync(appConfig.certificate.certPath),
+        key: fs.readFileSync(appConfig.certificate.keyPath)
+      },
+      app.callback()
+    );
+  } else {
+    server = http.createServer(app.callback());
+  }
+  app.listen = function listen() {
+    server.listen.apply(server, arguments);
+    return server;
+  };
 
-    app.server = options.https ? https.createServer(options.https || {}, app.callback()) : http.createServer(app.callback());
-    app.listen = function listen() {
-      app.server.listen.apply(app.server, arguments);
-      return app.server;
-    }
+  if (appConfig.enable_websocket) {
+    handleWebSocket(server, router.wsRouter);
   }
 
-  if (options.websocket) {
-
-    console.log("=== websocket:");
-    const websocket = require(path.join(__dirname, "./lib/handleWebSocket")),
-      ws = new websocket(app.server, route.wsRoute, options.websocket);
-    app.ws = ws.init();
-    console.dir(app.ws);
-    console.log("===");
+  if (appConfig.enable_spa_history_mode) {
+    app.middleware.unshift(handleSpaMode());
   }
+
+  if (appConfig.enable_https) {
+    const enforceHttps = require("koa-sslify");
+    app.middleware.unshift(enforceHttps());
+  }
+
+  app.server = server;
 };

@@ -1,65 +1,72 @@
-const EventEmitter = require("events").EventEmitter;
-const io = require("socket.io");
+const url = require("url");
+const WebSocket = require("ws");
+const { getClientIp } = require("../../utils");
 
-class WebSocket extends EventEmitter {
-
-  constructor(server, routes, options) {
-    super();
-    this._socketServer = io(server, options);
-    this._routes = routes;
-    this._nsp = null;
-  }
-
-  init(nspn) {
-
-    let self = this;
-    this._nsp = this._socketServer.of(nspn || 'mincola');
-    this._nsp.use((socket, next) => {
-      next();
+module.exports = (server, routes) => {
+  console.log("* enable websocket server");
+  const wss = new WebSocket.Server({ noServer: true });
+  server.on("upgrade", (request, socket, head) => {
+    // console.log('to do auth ', request, socket, head)
+    // if (!request.headers.authorization) {
+    //   socket.destroy()
+    //   return
+    // }
+    // const pathname = url.parse(request.url).pathname
+    // socket.destroy();
+    wss.handleUpgrade(request, socket, head, ws => {
+      wss.emit("connection", ws, request);
     });
-    this._nsp.on("connection", function (socket) {
+  });
 
-      self.emit("connected", socket);
-      socket.use((packet, next) => {
-
-        let route = packet.shift();
-        if (routes[route]) {
-          let result = routes[route].apply(socket, packet);
-          if (result) {
-
-            if (result instanceof Promise) {
-
-              result.then(function (data) {
-                self.emit("handled", data);
-              });
-            } else {
-              self.emit("handled", result);
-            }
+  wss
+    .on("connection", (ws, request) => {
+      const ip = getClientIp(request);
+      console.log("连接成功", ip, request);
+      ws.on("message", packet => {
+        console.log("packet:", packet);
+        let packetObj = null;
+        try {
+          packetObj = JSON.parse(packet);
+        } catch (error) {
+          console.log(error);
+          return;
+        }
+        if (!packetObj || !packetObj.target) {
+          return;
+        }
+        const target = routes[packetObj.target];
+        if (target) {
+          const result = target.apply(ws, [wss.clients, packetObj.data]);
+          if (result && result instanceof Promise) {
+            result.then(function(data) {
+              if (data) {
+                // eslint-disable-next-line max-nested-callbacks
+                ws.send(JSON.stringify(data), () => {
+                  console.log("发送完成");
+                });
+              }
+            });
+          } else {
+            ws.send(JSON.stringify(result), () => {
+              console.log("发送完成");
+            });
           }
         }
-
-        next();
-      });
-
-      // socket.on('disconnecting', (reason) => {
-      // });
-
-      socket.on('disconnect', (reason) => {
-        self.emit("disconnected", reason);
-      });
-
-      socket.on('error', (error) => {
-        self.emit("error", error);
-      });
+      })
+        .on("close", () => {
+          console.log("客户端关闭");
+        })
+        .on("error", error => {
+          console.error(error);
+        })
+        .on("unexpected-response", (request, response) => {
+          console.error("unexpected-response", request, response);
+        });
+    })
+    .on("close", () => {
+      console.log("服务器关闭");
+    })
+    .on("error", error => {
+      console.error(error);
     });
-
-    return this;
-  }
-
-  broadcast(channel, action, data) {
-    this._nsp.to(channel).emit(action, data);
-    return this;
-  }
-}
-
-module.exports = WebSocket;
+};

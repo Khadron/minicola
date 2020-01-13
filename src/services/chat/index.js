@@ -1,50 +1,44 @@
-var Redis = require('ioredis');
+const Redis = require("ioredis");
 const roomSet = {};
 
 module.exports = (webSocket, config) => {
+  if (!webSocket) {
+    return;
+  }
 
-    if (!webSocket) {
-        return;
+  const pub = Redis(config.redis);
+  const sub = Redis(config.redis);
+  let roomId = null;
+
+  webSocket.on("connected", socket => {
+    roomId = socket.handshake.query.roomId;
+    socket.join(roomId);
+
+    if (!roomSet[roomId]) {
+      roomSet[roomId] = {};
+      sub.subscribe(roomId);
     }
 
-    let pub = Redis(config.redis),
-        sub = Redis(config.redis);
+    roomSet[roomId][socket.id] = {};
+  });
 
-    webSocket.on("connected", (socket) => {
+  webSocket.on("handled", data => {
+    pub.publish(roomId, data);
+  });
 
-        let roomId = socket.handshake.query.roomId;
-        socket.join(roomId);
+  webSocket.on("disconnected", reason => {
+    console.log(reason);
+  });
 
-        if (!roomSet[roomId]) {
-            roomSet[roomId] = {};
-            sub.subscribe(roomId);
-        }
+  webSocket.on("error", error => {
+    console.log(error);
+  });
 
-        roomSet[roomId][socket.id] = {};
+  sub.on("subscribe", (channel, count) => {
+    console.log("worker pid: " + process.pid + " subscribe: " + channel);
+  });
 
-    });
-
-    webSocket.on("handled", (data) => {
-        pub.publish(roomId, {
-            "action": route,
-            "data": data
-        });
-    });
-
-    webSocket.on("disconnected", (reason) => {
-
-    });
-
-    webSocket.on("error", (error) => {
-
-    });
-
-    sub.on("subscribe", (channel, count) => {
-        console.log('worker pid: ' + process.pid + ' subscribe: ' + channel);
-    });
-
-    sub.on("message", (channel, message) => {
-        webSocket.broadcast(channel, "message", JSON.parse(message))
-    });
-
-}
+  sub.on("message", (channel, message) => {
+    webSocket.broadcast(channel, "message", JSON.parse(message));
+  });
+};

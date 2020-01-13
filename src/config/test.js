@@ -1,4 +1,4 @@
-module.exports ={
+module.exports = {
   redis: {
     host: "0.0.0.0",
     password: "......",
@@ -8,4 +8,4 @@ module.exports ={
   proxy: {
     host: "test.sample.com"
   }
-}
+};

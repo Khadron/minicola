@@ -1,0 +1,27 @@
+{
+    "app_routes": [
+        {
+            "name": "v1",
+            "prefix": "api",
+            "version": "v1"
+        },
+        {
+            "name": "v2",
+            "prefix": "api",
+            "version": "v2"
+        },
+        {
+            "name": "socket",
+            "prefix": "cola",
+            "upgrade": "ws"
+        }
+    ],
+    "enable_spa_history_mode": true,
+    "enable_https": false,
+    "enable_websocket": true,
+    "max_pool_size": 16,
+    "certificate": {
+        "certPath": null,
+        "keyPath": null
+    }
+}

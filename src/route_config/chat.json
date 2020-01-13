@@ -1,0 +1,9 @@
+// {
+//     "message": {
+//         "route": "/",
+//         "method": "get",
+//         "own": "web",
+//         "ignoreauth": true,
+//         "socket": true
+//     }
+// }

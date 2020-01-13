@@ -1,6 +1,7 @@
+/* eslint-disable no-undef */
 const path = require("path");
-let handlerPath = process.argv.slice(-1)[0],
-  modulePath = "";
+const handlerPath = process.argv.slice(-1)[0];
+let modulePath = "";
 console.log("handler path:", handlerPath);
 
 if (path.isAbsolute(handlerPath)) {
@@ -18,8 +19,8 @@ if (process.send) {
   });
 }
 
-process.on("message", function (message) {
-  let ret = {
+process.on("message", function(message) {
+  const ret = {
     success: false,
     rid: message.rid
   };
@@ -31,21 +32,21 @@ process.on("message", function (message) {
       ret.action = "processing";
       ret.success = true;
       if (result) {
-
         if (result instanceof Promise) {
-          return result.then((data) => {
-            ret.data = data;
-            process.send(ret);
-          }).catch((err) => {
-            ret.success = false;
-            ret.error = err.message;
-            process.send(ret);
-          })
+          return result
+            .then(data => {
+              ret.data = data;
+              process.send(ret);
+            })
+            .catch(err => {
+              ret.success = false;
+              ret.error = err.message;
+              process.send(ret);
+            });
         } else {
           ret.data = result;
         }
       }
-
     } catch (err) {
       ret.success = false;
       ret.error = err.message;
@@ -55,8 +56,7 @@ process.on("message", function (message) {
   process.send(ret);
 });
 
-
-process.on('uncaughtException', (err) => {
+process.on("uncaughtException", err => {
   console.error("unknown exception:", err);
   process.exit(1314);
 });

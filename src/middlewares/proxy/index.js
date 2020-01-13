@@ -1,73 +1,69 @@
-const Request = require('request');
-const url = require('url');
-const fs = require('fs');
-const mime = require('../../core/mime');
+const Request = require("request");
+const url = require("url");
+const fs = require("fs");
+const mime = require("../../utils/mime");
 
-module.exports = function (config = {}) {
+module.exports = (config = {}) => {
   let defaultConfig = {
-    protocol: 'http',
-    host: '',
+    protocol: "http",
+    host: "",
     timeout: 5000,
     gzip: true
-  }
-
+  };
   defaultConfig = Object.assign(defaultConfig, config);
-
   return async function colaProxy(ctx, next) {
     if (ctx.proxy) {
-      return await next();
+      await next();
+      return;
     }
-    let proxy = {
+    const proxy = {
       fetch(route, options = {}) {
         return _createRequest(ctx, route, options);
       },
       merge(proxyObjs, callback) {
-
-        var promises = [];
-        for (let key in proxyObjs) {
-
-          let proxyName = key,
-            cur = proxyObjs[key];
-
+        let promises = [];
+        // eslint-disable-next-line guard-for-in
+        for (const key in proxyObjs) {
+          const proxyName = key;
+          const cur = proxyObjs[key];
           cur.opts = cur.opts || {};
           cur.opts.proxyName = proxyName;
-
           promises.push(_createRequest(ctx, cur.route, cur.opts));
         }
-
-        return new Promise((resolve) => {
-          Promise.all(promises).then(function (datas) {
+        return new Promise(resolve => {
+          Promise.all(promises).then(function(datas) {
             resolve(callback(datas));
           });
         });
       },
       uploadFiles(route, opts) {
         return _createRequest(ctx, route, opts);
-      },
-      downloadFile() {
-
       }
     };
     Object.assign(ctx, {
       proxy
     });
-
     await next();
-  }
+  };
 
+  // eslint-disable-next-line complexity
   function _createOptions(route, ctx, opts = {}) {
-
-    let resolvedRoute = _resolveRoute(route);
-    let qs = resolvedRoute.qs || ctx.query;
-    let uri = url.format({
+    const resolvedRoute = _resolveRoute(route);
+    const qs = resolvedRoute.qs || ctx.query;
+    const uri = url.format({
       protocol: opts.protocol || defaultConfig.protocol || ctx.protocol,
       host: opts.host || defaultConfig.host,
-      pathname: encodeURI((ctx.captures && ctx.captures.length > 0) ? `${resolvedRoute.route}/${decodeURI(ctx.captures.join('/'))}`.replace(/\/\//gm, '/') : resolvedRoute.route),
+      pathname: encodeURI(
+        ctx.captures && ctx.captures.length > 0
+          ? `${resolvedRoute.route}/${decodeURI(
+              ctx.captures.join("/")
+            )}`.replace(/\/\//gm, "/")
+          : resolvedRoute.route
+      ),
       query: qs
     });
-
-    let curHeaders = Object.assign({}, ctx.headers);
-    let defaultOpts = {
+    const curHeaders = { ...ctx.headers};
+    const defaultOpts = {
       hostname: opts.host,
       url: uri,
       method: opts.method || ctx.request.method,
@@ -81,44 +77,41 @@ module.exports = function (config = {}) {
     delete defaultOpts.protocol;
     delete defaultOpts.headers["content-length"];
     delete defaultOpts.headers["if-modified-since"];
-    delete defaultOpts.headers["cookie"];
-    delete defaultOpts.headers["host"];
-    delete defaultOpts.headers["origin"];
-    delete defaultOpts.headers["referer"];
-    delete defaultOpts.headers["authorization"];
+    delete defaultOpts.headers.cookie;
+    delete defaultOpts.headers.host;
+    delete defaultOpts.headers.origin;
+    delete defaultOpts.headers.referer;
+    delete defaultOpts.headers.authorization;
     defaultOpts.headers["user-agent"] = "mincola";
     defaultOpts.headers["Transfer-Encoding"] = "chunked";
-    defaultOpts.headers["userIdentity"] = defaultOpts.headers["useridentity"] ? defaultOpts.headers["useridentity"] : "";
-    defaultOpts.headers["loginName"] = "";
-    defaultOpts.headers["userId"] = "";
+    defaultOpts.headers.userIdentity = defaultOpts.headers.useridentity
+      ? defaultOpts.headers.useridentity
+      : "";
+    defaultOpts.headers.loginName = "";
+    defaultOpts.headers.userId = "";
 
     if (ctx.auth) {
       console.log(`auth info：${ctx.auth}`);
-      defaultOpts.headers["userIdentity"] = ctx.auth.identity;
-      defaultOpts.headers["loginName"] = ctx.auth.userName;
-      defaultOpts.headers["userId"] = ctx.auth.userId;
+      defaultOpts.headers.userIdentity = ctx.auth.identity;
+      defaultOpts.headers.loginName = ctx.auth.userName;
+      defaultOpts.headers.userId = ctx.auth.userId;
     }
 
     if (ctx.is(mime.text)) {
-
       defaultOpts.body = ctx.request.body;
     } else if (ctx.is(mime.json)) {
-
       defaultOpts.json = true;
       defaultOpts.body = ctx.request.body;
       Object.assign(defaultOpts.body, opts.params);
     } else if (ctx.is(mime.form)) {
-
       defaultOpts.form = ctx.request.body;
       Object.assign(defaultOpts.form, opts.params);
     } else if (ctx.is(mime.formData)) {
-
-      let formData = [],
-        files = ctx.request.body.files;
+      const formData = [];
+      const files = ctx.request.body.files;
       defaultOpts.formData = {};
       if (Array.isArray(files)) {
-
-        for (let file of files) {
+        for (const file of files) {
           formData.push({
             value: fs.createReadStream(file.path),
             options: {
@@ -153,69 +146,87 @@ module.exports = function (config = {}) {
   }
 
   function _createRequest(ctx, route, cfg) {
-
     try {
-      opts = _createOptions(route, ctx, cfg);
-      console.log("\n\t-----http proxy options-------\n\t");
-      console.log(opts);
-      console.log("\n\t-----http proxy options-------\n\t");
-
-      return new Promise((resolve) => {
-
-        let size = 0,
-          chunks = [],
-          repType = [];
-
+      const opts = _createOptions(route, ctx, cfg);
+      console.log("\n-----<http proxy options>-------\n");
+      console.log(
+        "url=",
+        opts.url,
+        "method=",
+        opts.method,
+        "\nheaders=",
+        opts.headers,
+        "\nbody=",
+        opts.body
+      );
+      console.log("\n-----</http proxy options>-------\n");
+      return new Promise(resolve => {
+        let size = 0;
+        const chunks = [];
+        let repType = [];
         if (process.env.DEV) {
-          ctx.set('x-application-proxy-name', encodeURIComponent(opts.proxyName));
+          ctx.set(
+            "x-application-proxy-name",
+            encodeURIComponent(opts.proxyName)
+          );
         }
-
         Request(opts)
-          .on('response', function (response) {
+          .on("response", function(response) {
             if (!response) {
-              throw new Error('reposne is null');
+              throw new Error("reposne is null");
             }
-
-            let rep = response;
-            let curHeaders = rep.headers;
+            const rep = response;
+            const curHeaders = rep.headers;
             if (!curHeaders) {
-              throw new Error('reposne headers is null');
+              throw new Error("reposne headers is null");
             }
-            let type = curHeaders["content-type"];
+            const type = curHeaders["content-type"];
             if (type) {
-              repType = type.split(';');
+              repType = type.split(";");
               ctx.set("content-type", type);
             } else {
-              ctx.set("content-type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+              ctx.set(
+                "content-type",
+                "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+              );
             }
-
-            if (opts.download || type.indexOf("application/octet-stream") > -1) {
-              ctx.set('Content-Disposition', rep.headers["content-disposition"] || "attachment; filename=download");
+            if (opts.download) {
+              let filename = "download";
+              if (rep.headers["content-disposition"]) {
+                filename =
+                  rep.headers["content-disposition"]
+                    .replace("attachment;", "")
+                    .replace("filename", "")
+                    .replace("=", "")
+                    .replace(/\s/gim, "") || "download";
+              }
+              ctx.set(
+                "Content-Disposition",
+                `attachment; filename*=UTF-8''${filename}`
+              );
+              // ctx.set('content-disposition', rep.headers["content-disposition"] || "attachment; filename=download");
             }
-
-          }).on('data', function (chunk) {
-
+          })
+          .on("data", function(chunk) {
             size += chunk.length;
             chunks.push(chunk);
-          }).on('end', function () {
-
+          })
+          .on("end", function() {
             ctx.set("Content-Length", size);
             ctx.statusCode = 200;
-            let bin = Buffer.concat(chunks, size);
+            const bin = Buffer.concat(chunks, size);
             if (repType.indexOf(mime.json) > -1) {
-
-              let str = bin.toString('utf-8');
-              let json = {
+              const str = bin.toString("utf-8");
+              const json = {
                 error: true,
-                message: '',
+                message: "",
                 data: null,
                 code: 0
-              }
+              };
               try {
-                let data = JSON.parse(str);
+                const data = JSON.parse(str);
                 if (data) {
                   json.code = data.code;
-
                   if (data.error) {
                     json.message = data.message || data.error;
                     if (data.status === 500) {
@@ -223,7 +234,7 @@ module.exports = function (config = {}) {
                     }
                   } else {
                     if (data.hasOwnProperty("data")) {
-                      json.error = !((data.code >= 2000 && data.code < 3000) || (data.code >= 7000 && data.code < 8000));
+                      json.error = !(data.code >= 2000 && data.code < 3000);
                       Object.assign(json, data);
                     } else {
                       Object.assign(json, {
@@ -232,7 +243,6 @@ module.exports = function (config = {}) {
                     }
                   }
                 }
-
               } catch (error) {
                 console.warn(`[warn] invaild json format:${route}`);
                 json.message = "";
@@ -241,21 +251,18 @@ module.exports = function (config = {}) {
               return resolve(json);
             }
             return resolve(bin);
-          }).on('error', function (error) {
-
-
-            if (error.code === 'ETIMEDOUT') {
+          })
+          .on("error", function(error) {
+            if (error.code === "ETIMEDOUT") {
               if (error.connect === true) {
-                error.message = "连接服务器超时"
+                error.message = "连接服务器超时";
               } else {
-                error.message = "网络原因导致超时"
+                error.message = "网络原因导致超时";
               }
               console.log(`连接超时：${opts.url}`);
-            } else if (error.code === 'ESOCKETTIMEDOUT') {
+            } else if (error.code === "ESOCKETTIMEDOUT") {
               error.message = "O~ NO！连不上服务器了……";
             }
-
-
             return resolve({
               error: true,
               message: error.message,
@@ -265,30 +272,26 @@ module.exports = function (config = {}) {
       });
     } catch (error) {
       console.error(error);
-      return Promise.reject(error.message)
+      return Promise.reject(error.message);
     }
-
   }
 
   function _prettyProxyName(route) {
-    return route.replace(/\//g, '-').replace(/^-+|-+$/g, '');
+    return route.replace(/\//g, "-").replace(/^-+|-+$/g, "");
   }
 
   function _resolveRoute(endRoute) {
-    let qsStart = endRoute.indexOf("?"),
-      reuslt = {
-        qs: {},
-        route: endRoute
-      };
+    const qsStart = endRoute.indexOf("?");
+    const reuslt = {
+      qs: {},
+      route: endRoute
+    };
     if (qsStart > -1) {
-
-      let nqs = endRoute.substring(qsStart + 1);
-      let qs = require("querystring");
+      const nqs = endRoute.substring(qsStart + 1);
+      const qs = require("querystring");
       reuslt.qs = qs.parse(nqs);
       reuslt.route = endRoute.substring(0, qsStart);
     }
-
     return reuslt;
   }
-
-}
+};

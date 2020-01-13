@@ -2,19 +2,23 @@
   "helloworldPage": {
     "route": "/",
     "method": "get",
-    "type": "web",
     "ignoreauth": true
   },
   "tokenPage": {
     "route": "/token",
     "method": "get",
-    "type": "web",
     "ignoreauth": true
   },
   "generateToken": {
     "pathname": "/token",
     "method": "post",
-    "type": "webApi",
+    "own": "v1",
+    "ignoreauth": true
+  },
+  "chat": {
+    "pathname": "/",
+    "method": "post",
+    "own": "socket",
     "ignoreauth": true
   }
 }
