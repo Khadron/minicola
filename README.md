@@ -36,6 +36,17 @@ node version >=8.94
 
 koa >=2.0
 
+## 更新日志 
+
+### v3.0
+
+1. 更新依赖包版本
+2. 更换启动方式，增加starer.js
+3. 增加路由命名空间，用于接口版本升级及对路由更小粒度划分
+4. 增加handleHistoryMode插件，用来解决单页面应用路由采用history模式下页面刷新造成404问题
+5. 改写websocket实现方式，增加websocket应用Demo
+6. 代码优化
+
 ## 命令
 
 ```shell

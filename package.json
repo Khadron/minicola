@@ -1,39 +1,44 @@
 {
   "name": "minicola",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "一个基于koa2，小而美的RESTful API+MVC的web开发框架！",
-  "main": "server.js",
+  "main": "starter.js",
   "scripts": {
-    "prod": "cross-env NODE_ENV=production node ./src/server",
-    "dev": "cross-env NODE_ENV=development node ./src/server",
-    "test": "cross-env NODE_ENV=test node ./src/server"
+    "prod": "cross-env NODE_ENV=production node ./src/starter",
+    "dev": "cross-env NODE_ENV=development node ./src/starter",
+    "local": "cross-env NODE_ENV=local node ./src/starter.js",
+    "test": "cross-env NODE_ENV=test node ./src/starter"
   },
   "author": "khadron <khadron@163.com> (http://khadron.com)",
   "license": "MIT",
   "repository": "Khadron/minicola",
   "dependencies": {
-    "ejs": "^2.6.1",
-    "ioredis": "^4.5.1",
+    "@koa/router": "^8.0.0",
+    "ejs": "^2.6.2",
+    "ioredis": "^4.14.0",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.0",
-    "koa-body": "^2.5.0",
-    "koa-bodyparser": "^4.2.0",
+    "koa-body": "^4.1.1",
+    "koa-bodyparser": "^2.5.0",
     "koa-convert": "^1.2.0",
     "koa-generic-session": "^2.0.1",
     "koa-json": "^2.0.2",
     "koa-log": "^2.1.0",
     "koa-onerror": "^4.0.0",
-    "koa-redis": "^3.1.2",
-    "koa-router": "^7.4.0",
-    "koa-static": "^4.0.2",
-    "koa-views": "^6.1.4",
+    "koa-redis": "^4.0.0",
+    "koa-sslify": "^4.0.3",
+    "koa-static": "^5.0.0",
+    "koa-views": "^6.2.0",
     "request": "^2.85.0",
     "socket.io": "^2.1.1",
     "uuid": "^3.3.2",
+    "ws": "^7.1.2",
     "xss": "^1.0.3"
   },
   "devDependencies": {
+    "babel-eslint": "^10.0.3",
     "cross-env": "^5.2.0",
+    "eslint": "^6.2.2",
     "nodemon": "^1.17.2"
   }
 }
