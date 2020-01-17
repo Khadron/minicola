@@ -56,7 +56,38 @@ npm run dev  //开发环境启动命令
 npm run test //测试环境启动命令
 ```
 
-## Hello world!
+## Hello World!
+#### 0.配置application.json（v3.0新增）
+```js
+{
+    // 配置路由相关信息
+    "app_routes": [
+        {
+            "name": "apiv1", // 路由名称
+            "prefix": "api", // 对应koa-router的prefix
+            "version": "v1" // api版本号
+        },
+        {
+            "name": "apiv2",
+            "prefix": "api",
+            "version": "v2"
+        },
+        {
+            "name": "isocket",
+            "prefix": "cola",
+            "upgrade": "ws"
+        }
+    ],
+    "enable_spa_history_mode": true, // 启用支持history方式的前端路由
+    "enable_https": false, // 启用https，同certificate配合使用
+    "enable_websocket": true,// 启用websocket支持
+    "max_pool_size": 16, // 设置libuv线程池的大小
+    "certificate": {
+        "certPath": null,
+        "keyPath": null
+    }
+}
+```
 #### 1.新建home controller文件，放到controller文件夹中
 
 ```js
@@ -97,6 +128,7 @@ module.exports = new HomeController()
   route完全自定义路由。eg:/666/token
   method表示请求过来的http方法。eg:GET,POST或DEL
   ignoreauth表示是否忽略对其进行鉴权，true表示忽略接口鉴权行为
+  own(新增)：表示当前路由属于哪个命名空间的
 */
 {
   "homePage": {
@@ -104,6 +136,7 @@ module.exports = new HomeController()
     // "pathname":"/"
     "method": "get",
     "type": "web",
+    "own":"v1",
     "ignoreauth": true
   }
 }

@@ -7,6 +7,7 @@ const appConfig = require("../application.json");
 const handleRoute = require("./lib/handleRoute");
 const handleWebSocket = require("./lib/handleWebSocket");
 const handleSpaMode = require("./lib/handleHistoryMode");
+process.env.UV_THREADPOOL_SIZE = appConfig.max_pool_size;
 
 function traverseDir(dir, result) {
   result = result || [];
@@ -37,7 +38,6 @@ function generateCtrlFiles(ctrlRoot) {
 }
 
 module.exports = (app, options) => {
-  process.env.UV_THREADPOOL_SIZE = appConfig.max_pool_size;
   const opts = {
     ctrlRoot: path.join(__dirname, "../controller"),
       routeCfgRoot: path.join(__dirname, "../route_config"),
