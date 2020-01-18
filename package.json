@@ -1,6 +1,6 @@
 {
     "name": "minicola",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "description": "一个基于koa2，小而美的RESTful API+MVC的web开发框架！",
     "main": "starter.js",
     "scripts": {

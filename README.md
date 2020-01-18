@@ -2,6 +2,7 @@
 
 ## 简介
 `minicola` 一个基于`koa2`，小而美的`RESTful API` + `MVC`的Web开发框架！
+
 支持`websocket`和多进程，`v3.0`新鲜出炉！！！
 
 ## 设计思想
@@ -28,6 +29,11 @@
 ### Auth
 
 API鉴权模块，采用JSON Web Token验证方式，多进程实现
+
+## 安装
+```shell
+npm i minicola
+```
 
 ## 运行环境
 
@@ -194,7 +200,7 @@ module.exports = Object.assign({}, template);
 
 ```
 
-#### 5.启动
+#### 5.开发&启动
 
 ``` js
 /*
