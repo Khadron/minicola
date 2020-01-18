@@ -1,8 +1,8 @@
 # minicola
 
 ## 简介
-**minicola** 一个基于**koa2**，小而美的**RESTful API** + **MVC**的Web开发框架！
-支持websocket和多进程，v3.0新鲜出炉！！！
+`minicola` 一个基于`koa2`，小而美的`RESTful API` + `MVC`的Web开发框架！
+支持`websocket`和多进程，`v3.0`新鲜出炉！！！
 
 ## 设计思想
 
